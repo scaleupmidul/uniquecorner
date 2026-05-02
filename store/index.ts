@@ -226,8 +226,32 @@ export const useAppStore = create<any>()(
             set({ cart: newCart });
             get()._updateCartTotal();
 
+            const eventId = `${Date.now()}.${Math.floor(Math.random() * 1000000)}`;
+
+            // Data Layer Push for GTM (Browser Pixel)
+            if (typeof window !== 'undefined') {
+                (window as any).dataLayer = (window as any).dataLayer || [];
+                (window as any).dataLayer.push({ ecommerce: null });
+                (window as any).dataLayer.push({
+                    event: 'add_to_cart',
+                    event_id: eventId,
+                    ecommerce: {
+                        currency: 'BDT',
+                        value: product.price * quantity,
+                        items: [{
+                            item_id: itemIdForAnalytics,
+                            item_name: product.name,
+                            price: product.price,
+                            quantity: quantity,
+                            item_variant: size
+                        }]
+                    }
+                });
+            }
+
             // Unified Server-side Tracking
             trackServerEvent('AddToCart', {
+                event_id: eventId,
                 value: product.price * quantity,
                 currency: 'BDT',
                 content_ids: [itemIdForAnalytics],
