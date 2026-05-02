@@ -233,7 +233,7 @@ export const useAppStore = create<any>()(
                 (window as any).dataLayer = (window as any).dataLayer || [];
                 (window as any).dataLayer.push({ ecommerce: null });
                 (window as any).dataLayer.push({
-                    event: 'add_to_cart',
+                    event: 'AddToCart',
                     event_id: eventId,
                     ecommerce: {
                         currency: 'BDT',
