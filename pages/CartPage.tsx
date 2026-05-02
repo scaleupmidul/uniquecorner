@@ -110,7 +110,7 @@ const CartPage: React.FC = () => {
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({ ecommerce: null }); // Clear previous ecommerce object
         window.dataLayer.push({
-            event: 'view_cart',
+            event: 'ViewCart',
             event_id: eventId,
             ecommerce: {
                 currency: 'BDT',
