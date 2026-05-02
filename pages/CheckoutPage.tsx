@@ -159,9 +159,13 @@ const CheckoutPage: React.FC = () => {
 
         if (pendingIdResolution) return;
 
+        const eventId = `${Date.now()}.${Math.floor(Math.random() * 1000000)}`;
+
         window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ ecommerce: null });
         window.dataLayer.push({
             event: 'begin_checkout',
+            event_id: eventId, // Shared ID
             ecommerce: {
                 currency: 'BDT',
                 value: safeCartTotal,
@@ -181,6 +185,7 @@ const CheckoutPage: React.FC = () => {
 
         // Server-side tracking
         trackServerEvent('begin_checkout', {
+            event_id: eventId, // THE SAME Shared ID
             value: safeCartTotal,
             currency: 'BDT',
             content_ids: cart.map(item => {
