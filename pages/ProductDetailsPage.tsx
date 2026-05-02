@@ -130,6 +130,7 @@ const ProductDetailsPage: React.FC = () => {
     if (product) {
         const currentId = product.productId || product.id;
         if (analyticsFiredId.current !== currentId) {
+            const eventId = `${Date.now()}.${Math.floor(Math.random() * 1000000)}`;
             setCurrentImageIndex(0);
             window.scrollTo(0, 0); 
             
@@ -137,6 +138,7 @@ const ProductDetailsPage: React.FC = () => {
             window.dataLayer.push({ ecommerce: null });
             window.dataLayer.push({
                 event: 'view_item',
+                event_id: eventId,
                 ecommerce: {
                     currency: 'BDT',
                     items: [{
@@ -150,6 +152,7 @@ const ProductDetailsPage: React.FC = () => {
 
             // Server-side tracking
             trackServerEvent('ViewContent', {
+                event_id: eventId,
                 transaction_id: `view_${Date.now()}`,
                 value: product.price,
                 currency: 'BDT',
@@ -245,8 +248,30 @@ const ProductDetailsPage: React.FC = () => {
 
       addToCart(product, quantity, selectedSize!);
 
+      const eventId = `${Date.now()}.${Math.floor(Math.random() * 1000000)}`;
+
+      // Data Layer Push for GTM
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ ecommerce: null });
+      window.dataLayer.push({
+          event: 'begin_checkout',
+          event_id: eventId,
+          ecommerce: {
+              currency: 'BDT',
+              value: product.price * quantity,
+              items: [{
+                  item_id: product.productId || product.id,
+                  item_name: product.name,
+                  price: product.price,
+                  quantity: quantity,
+                  item_variant: selectedSize
+              }]
+          }
+      });
+
       // Server-side tracking
       trackServerEvent('InitiateCheckout', {
+          event_id: eventId,
           value: product.price * quantity,
           currency: 'BDT',
           content_ids: [product.productId || product.id],
