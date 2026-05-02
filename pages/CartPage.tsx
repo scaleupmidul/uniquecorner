@@ -105,10 +105,13 @@ const CartPage: React.FC = () => {
 
         if (pendingIdResolution) return;
 
+        const eventId = `${Date.now()}.${Math.floor(Math.random() * 1000000)}`;
+
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({ ecommerce: null }); // Clear previous ecommerce object
         window.dataLayer.push({
             event: 'view_cart',
+            event_id: eventId,
             ecommerce: {
                 currency: 'BDT',
                 value: cartTotal,
@@ -129,6 +132,7 @@ const CartPage: React.FC = () => {
 
         // Server-side tracking for GA4 / Meta
         trackServerEvent('view_cart', {
+            event_id: eventId,
             value: cartTotal,
             currency: 'BDT',
             num_items: cart.length,
