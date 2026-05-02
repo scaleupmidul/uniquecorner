@@ -223,22 +223,6 @@ const ProductDetailsPage: React.FC = () => {
     if (!product) return;
     
     addToCart(product, quantity, selectedSize!);
-    
-    // Server-side tracking
-    trackServerEvent('AddToCart', {
-        value: product.price * quantity,
-        currency: 'BDT',
-        content_ids: [product.productId || product.id],
-        content_name: product.name,
-        num_items: quantity,
-        items: [{
-            id: product.productId || product.id,
-            name: product.name,
-            price: product.price,
-            quantity: quantity
-        }]
-    }, {});
-
     navigate('/cart');
   };
 
@@ -247,37 +231,6 @@ const ProductDetailsPage: React.FC = () => {
       if (!product) return;
 
       addToCart(product, quantity, selectedSize!);
-
-      const eventId = `${Date.now()}.${Math.floor(Math.random() * 1000000)}`;
-
-      // Data Layer Push for GTM
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({ ecommerce: null });
-      window.dataLayer.push({
-          event: 'begin_checkout',
-          event_id: eventId,
-          ecommerce: {
-              currency: 'BDT',
-              value: product.price * quantity,
-              items: [{
-                  item_id: product.productId || product.id,
-                  item_name: product.name,
-                  price: product.price,
-                  quantity: quantity,
-                  item_variant: selectedSize
-              }]
-          }
-      });
-
-      // Server-side tracking
-      trackServerEvent('InitiateCheckout', {
-          event_id: eventId,
-          value: product.price * quantity,
-          currency: 'BDT',
-          content_ids: [product.productId || product.id],
-          num_items: quantity
-      }, {});
-
       navigate('/checkout');
   }
 
