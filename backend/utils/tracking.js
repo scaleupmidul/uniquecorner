@@ -85,7 +85,7 @@ export const trackGA4Event = async (eventName, params, clientId, config = {}) =>
     const api_secret = config.gaApiSecret || process.env.GA4_API_SECRET;
 
     if (!measurement_id || !api_secret) {
-        console.warn('GA4 Tracking skipped: Missing credentials in .env');
+        console.warn('GA4 Tracking skipped: Missing G-ID or API Secret in Settings');
         return;
     }
 
@@ -93,6 +93,7 @@ export const trackGA4Event = async (eventName, params, clientId, config = {}) =>
     const eventMapping = {
         'ViewContent': 'view_item',
         'AddToCart': 'add_to_cart',
+        'ViewCart': 'view_cart',
         'InitiateCheckout': 'begin_checkout',
         'AddPaymentInfo': 'add_payment_info',
         'Purchase': 'purchase'
@@ -105,16 +106,25 @@ export const trackGA4Event = async (eventName, params, clientId, config = {}) =>
 
     const url = `https://www.google-analytics.com/mp/collect?measurement_id=${measurement_id}&api_secret=${api_secret}`;
 
-    // Standardize items for GA4 if they exist
-    let gaItems = params.items || [];
-    if (gaItems.length === 0 && params.content_ids) {
-        // Fallback or handle single item from content_ids
+    // Standardize items for GA4
+    let gaItems = [];
+    
+    if (params.items && Array.isArray(params.items)) {
+        gaItems = params.items.map(item => ({
+            item_id: String(item.item_id || item.id || ''),
+            item_name: String(item.item_name || item.name || 'Product'),
+            price: Number(item.price || 0),
+            quantity: Number(item.quantity || 1),
+            item_variant: String(item.item_variant || item.variant || ''),
+            item_category: String(item.item_category || item.category || '')
+        }));
+    } else if (params.content_ids && Array.isArray(params.content_ids)) {
         gaItems = params.content_ids.map(id => ({
-            item_id: id,
-            item_name: params.content_name || 'Product',
-            currency: params.currency || 'BDT',
-            price: params.value / (params.num_items || 1),
-            quantity: params.num_items || 1
+            item_id: String(id),
+            item_name: String(params.content_name || 'Product'),
+            currency: String(params.currency || 'BDT'),
+            price: Number(params.value || 0) / (params.num_items || 1),
+            quantity: Number(params.num_items || 1)
         }));
     }
 
@@ -124,9 +134,9 @@ export const trackGA4Event = async (eventName, params, clientId, config = {}) =>
             name: gaEventName,
             params: {
                 currency: params.currency || 'BDT',
-                value: params.value || 0,
-                transaction_id: params.transaction_id,
-                shipping: params.shipping,
+                value: Number(params.value || 0),
+                transaction_id: params.transaction_id ? String(params.transaction_id) : undefined,
+                shipping: params.shipping ? Number(params.shipping) : undefined,
                 items: gaItems,
                 debug_mode: true,
                 engagement_time_msec: '100',
