@@ -131,7 +131,7 @@ const CartPage: React.FC = () => {
         });
 
         // Server-side tracking for GA4 / Meta
-        trackServerEvent('view_cart', {
+        trackServerEvent('ViewCart', {
             event_id: eventId,
             value: cartTotal,
             currency: 'BDT',
