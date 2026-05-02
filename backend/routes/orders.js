@@ -196,7 +196,7 @@ router.post('/', async (req, res) => {
             item_variant: item.size
         }));
 
-        trackGA4Event('purchase', {
+        trackGA4Event('Purchase', {
             transaction_id: createdOrder.orderId,
             value: total,
             currency: 'BDT',
