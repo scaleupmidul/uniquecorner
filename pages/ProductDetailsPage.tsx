@@ -137,7 +137,7 @@ const ProductDetailsPage: React.FC = () => {
             window.dataLayer = window.dataLayer || [];
             window.dataLayer.push({ ecommerce: null });
             window.dataLayer.push({
-                event: 'view_item',
+                event: 'ViewContent',
                 event_id: eventId,
                 ecommerce: {
                     currency: 'BDT',
