@@ -164,7 +164,7 @@ const CheckoutPage: React.FC = () => {
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({ ecommerce: null });
         window.dataLayer.push({
-            event: 'begin_checkout',
+            event: 'InitiateCheckout',
             event_id: eventId, // Shared ID
             ecommerce: {
                 currency: 'BDT',
