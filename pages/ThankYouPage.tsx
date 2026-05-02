@@ -63,7 +63,7 @@ const ThankYouPage: React.FC<ThankYouPageProps> = ({ orderId }) => {
             window.dataLayer = window.dataLayer || [];
             
             window.dataLayer.push({
-                event: 'purchase',
+                event: 'Purchase',
                 event_id: order.orderId || order.id, // Explicit event_id for deduplication
                 ecommerce: {
                     transaction_id: order.orderId || order.id,
