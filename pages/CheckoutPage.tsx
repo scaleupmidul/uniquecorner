@@ -184,7 +184,7 @@ const CheckoutPage: React.FC = () => {
         });
 
         // Server-side tracking
-        trackServerEvent('begin_checkout', {
+        trackServerEvent('InitiateCheckout', {
             event_id: eventId, // THE SAME Shared ID
             value: safeCartTotal,
             currency: 'BDT',
