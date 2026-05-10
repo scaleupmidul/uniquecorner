@@ -14,10 +14,11 @@ const ExitIntentPopup: React.FC = () => {
     // Only target specific pages if needed, or site-wide
     // The requirement says "Checkout page but changed decision"
     // We can show it on checkout page exit specifically
-    const isCheckoutPage = path === '/checkout' || path === '/cart';
+    const isCheckoutPage = path.includes('/checkout') || path.includes('/cart');
     
     if (!settings.exitIntentPopupEnabled || hasShown || !isCheckoutPage) return;
 
+    // 1. Desktop: Mouse leave detection
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY <= 0) {
         setIsVisible(true);
@@ -25,8 +26,26 @@ const ExitIntentPopup: React.FC = () => {
       }
     };
 
+    // 2. Mobile/Universal: Back button detection (popstate)
+    // We push a dummy state so when the user clicks back, we catch it
+    window.history.pushState({ popup: true }, '');
+    
+    const handlePopState = (e: PopStateEvent) => {
+      if (!hasShown && isCheckoutPage) {
+        setIsVisible(true);
+        setHasShown(true);
+        // Prevent actual back navigation once
+        window.history.pushState({ popup: true }, '');
+      }
+    };
+
     document.addEventListener('mouseleave', handleMouseLeave);
-    return () => document.removeEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, [settings.exitIntentPopupEnabled, hasShown, path]);
 
   const handleCopy = () => {
