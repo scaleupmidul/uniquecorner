@@ -42,7 +42,7 @@ const DEFAULT_SETTINGS: AppSettings = {
     signatureFashionMobileImage: '',
     signatureCosmeticsDesktopImage: '',
     signatureCosmeticsMobileImage: '',
-    exitIntentPopupEnabled: false,
+    exitIntentPopupEnabled: true,
     exitIntentDiscount: 60,
     exitIntentCouponCode: 'SAVE60'
 };
