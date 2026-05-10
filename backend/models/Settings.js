@@ -83,7 +83,10 @@ const SettingsSchema = new mongoose.Schema({
   fbPixelId: { type: String, default: '' },
   fbAccessToken: { type: String, default: '' },
   fbTestCode: { type: String, default: '' },
-  gtmId: { type: String, default: '' }
+  gtmId: { type: String, default: '' },
+  exitIntentPopupEnabled: { type: Boolean, default: false },
+  exitIntentDiscount: { type: Number, default: 60 },
+  exitIntentCouponCode: { type: String, default: 'SAVE60' }
 });
 
 const Settings = mongoose.model('Settings', SettingsSchema);
