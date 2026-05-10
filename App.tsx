@@ -8,6 +8,7 @@ import Footer from './components/Footer';
 import Notification from './components/Notification';
 import WhatsAppButton from './components/WhatsAppButton';
 import PageLoader from './components/PageLoader';
+import ExitIntentPopup from './components/ExitIntentPopup';
 
 // CORE PAGES: Static imports for instant performance on home/shop
 import HomePage from './pages/HomePage';
@@ -184,6 +185,7 @@ const App: React.FC = () => {
           {renderPage()}
       </div>
       {isCustomerPage && showWhatsAppButton && <WhatsAppButton />}
+      {isCustomerPage && <ExitIntentPopup />}
       {isCustomerPage && <Footer />}
     </div>
   );
