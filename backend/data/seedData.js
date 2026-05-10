@@ -76,4 +76,7 @@ Welcome to Unique Corner. We are committed to protecting your privacy...
   fbAccessToken: '',
   fbTestCode: '',
   gtmId: 'GTM-T7RFW3GJ',
+  exitIntentPopupEnabled: true,
+  exitIntentDiscount: 60,
+  exitIntentCouponCode: 'UNIQUE60',
 };
