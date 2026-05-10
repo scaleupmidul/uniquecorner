@@ -151,6 +151,9 @@ export interface AppSettings {
   fbAccessToken?: string;
   fbTestCode?: string;
   gtmId?: string;
+  exitIntentPopupEnabled: boolean;
+  exitIntentDiscount: number;
+  exitIntentCouponCode: string;
 }
 
 export interface AdminProductsPagination {
