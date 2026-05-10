@@ -41,7 +41,10 @@ const DEFAULT_SETTINGS: AppSettings = {
     signatureFashionDesktopImage: '',
     signatureFashionMobileImage: '',
     signatureCosmeticsDesktopImage: '',
-    signatureCosmeticsMobileImage: ''
+    signatureCosmeticsMobileImage: '',
+    exitIntentPopupEnabled: false,
+    exitIntentDiscount: 60,
+    exitIntentCouponCode: 'SAVE60'
 };
 
 const MOCK_PRODUCTS_DATA: Product[] = [];
