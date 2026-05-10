@@ -5,7 +5,7 @@ import {
     Save, LoaderCircle, Plus, Trash2, CheckCircle, Monitor, 
     Smartphone, Tag, CreditCard, Layout, Image as ImageIcon, 
     MessageSquare, Shield, X, Share2, Facebook, Instagram, 
-    Twitter, Youtube, ExternalLink, Settings as SettingsIcon, 
+    Twitter, Youtube, ExternalLink, Settings as SettingsIcon, Gift,
     Type, Percent, Palette, Move, AlertTriangle, HelpCircle,
     ShoppingBag, Info, Sparkles, Layers, Eye, EyeOff, SmartphoneNfc,
     Globe, PhoneCall, MapPin, MousePointer2, AlignLeft,
@@ -251,6 +251,9 @@ const AdminSettingsPage: React.FC = () => {
     const [fbAccessToken, setFbAccessToken] = useState('');
     const [fbTestCode, setFbTestCode] = useState('');
     const [gtmId, setGtmId] = useState('');
+    const [exitIntentPopupEnabled, setExitIntentPopupEnabled] = useState(false);
+    const [exitIntentDiscount, setExitIntentDiscount] = useState(60);
+    const [exitIntentCouponCode, setExitIntentCouponCode] = useState('SAVE60');
 
     // Initialize state from store
     useEffect(() => {
@@ -307,6 +310,9 @@ const AdminSettingsPage: React.FC = () => {
             setFbAccessToken(settings.fbAccessToken || '');
             setFbTestCode(settings.fbTestCode || '');
             setGtmId(settings.gtmId || '');
+            setExitIntentPopupEnabled(settings.exitIntentPopupEnabled ?? false);
+            setExitIntentDiscount(settings.exitIntentDiscount || 60);
+            setExitIntentCouponCode(settings.exitIntentCouponCode || 'SAVE60');
         }
     }, [settings]);
 
@@ -389,7 +395,10 @@ const AdminSettingsPage: React.FC = () => {
                 signatureFashionDesktopImage: sigFashDesk, signatureFashionMobileImage: sigFashMob, signatureCosmeticsDesktopImage: sigCosDesk, signatureCosmeticsMobileImage: sigCosMob,
                 gaMeasurementId, gaApiSecret,
                 fbPixelId, fbAccessToken, fbTestCode,
-                gtmId
+                gtmId,
+                exitIntentPopupEnabled,
+                exitIntentDiscount,
+                exitIntentCouponCode
             });
             setIsSaved(true);
             setConfirmSyncText('');
@@ -743,6 +752,86 @@ const AdminSettingsPage: React.FC = () => {
                 </div>
             );
 
+            case 'marketing': return (
+                <div className="space-y-6">
+                    <div className={cardClass}>
+                        <CompactSectionHeader icon={Gift} title="Conversion Optimization" sub="Exit Intent Popup Strategy" />
+                        
+                        <div className="p-5 bg-emerald-50 rounded-2xl border border-emerald-100 mb-6">
+                            <div className="flex gap-4 items-start">
+                                <div className="p-3 bg-white rounded-xl shadow-sm">
+                                    <Sparkles className="w-6 h-6 text-emerald-800" />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-black uppercase text-emerald-900 mb-1">Boost Your Sales Performance</h4>
+                                    <p className="text-[10px] text-emerald-800 leading-relaxed uppercase font-semibold">
+                                        The Exit Intent Popup appears when a customer is about to leave the checkout or cart page. 
+                                        Offering a small discount at this critical moment can recover up to 15-20% of abandoned carts.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
+                            <label className={`flex items-center gap-4 p-5 border-2 rounded-2xl cursor-pointer transition-all ${exitIntentPopupEnabled ? 'border-emerald-800 bg-emerald-50/50 shadow-md' : 'border-stone-100 bg-stone-50'}`}>
+                                <div className={`p-2 rounded-lg ${exitIntentPopupEnabled ? 'bg-emerald-800 text-white' : 'bg-stone-200 text-stone-400'}`}>
+                                    {exitIntentPopupEnabled ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                                </div>
+                                <div className="flex-grow">
+                                    <span className="block text-sm font-black uppercase tracking-tight text-stone-800">Exit Intent Strategy</span>
+                                    <span className="text-[10px] text-stone-400 uppercase font-bold">Show popup when user tries to leave site</span>
+                                </div>
+                                <input type="checkbox" checked={exitIntentPopupEnabled} onChange={e => setExitIntentPopupEnabled(e.target.checked)} className="w-6 h-6 text-emerald-800 rounded-lg" />
+                            </label>
+
+                            {exitIntentPopupEnabled && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-stone-50/30 border border-stone-100 rounded-2xl animate-fadeIn">
+                                    <div className="space-y-2">
+                                        <FormLabel>Discount Amount (৳)</FormLabel>
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-stone-400">৳</span>
+                                            <ProfessionalInput 
+                                                type="number" 
+                                                value={exitIntentDiscount} 
+                                                onChange={e => setExitIntentDiscount(Number(e.target.value))} 
+                                                className="pl-8 font-black text-emerald-800"
+                                            />
+                                        </div>
+                                        <p className="text-[9px] text-stone-400 font-bold uppercase tracking-widest px-1">Amount to show on the popup tag</p>
+                                    </div>
+                                    
+                                    <div className="space-y-2">
+                                        <FormLabel>Coupon Code</FormLabel>
+                                        <div className="relative">
+                                            <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                                            <ProfessionalInput 
+                                                value={exitIntentCouponCode} 
+                                                onChange={e => setExitIntentCouponCode(e.target.value.toUpperCase())} 
+                                                className="pl-12 font-black tracking-widest text-[#f91d5a]"
+                                                placeholder="SAVE60"
+                                            />
+                                        </div>
+                                        <p className="text-[9px] text-stone-400 font-bold uppercase tracking-widest px-1">Code customer will copy to use</p>
+                                    </div>
+                                    
+                                    <div className="md:col-span-2 p-4 bg-white rounded-xl border border-stone-100 shadow-sm flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-orange-50 rounded-lg">
+                                                <Info className="w-4 h-4 text-orange-600" />
+                                            </div>
+                                            <p className="text-[10px] text-stone-500 font-bold uppercase">
+                                                Visual Preview matches the demo picture with gradient colors.
+                                            </p>
+                                        </div>
+                                        <div className="px-3 py-1 bg-green-50 text-green-700 text-[9px] font-black rounded-full uppercase">Current Setting Valid</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+
             case 'content': return (
                 <div className="space-y-6">
                     <div className={cardClass}>
@@ -893,6 +982,7 @@ const AdminSettingsPage: React.FC = () => {
                         <TabButtonUI label="Hero Elements" isActive={activeTab === 'appearance'} onClick={() => handleTabSwitch('appearance')} icon={Layout} />
                         <TabButtonUI label="Decor Edit" isActive={activeTab === 'cosmetics'} onClick={() => handleTabSwitch('cosmetics')} icon={ImageIcon} />
                         <TabButtonUI label="Gadget Edit" isActive={activeTab === 'women'} onClick={() => handleTabSwitch('women')} icon={Monitor} />
+                        <TabButtonUI label="Marketing" isActive={activeTab === 'marketing'} onClick={() => handleTabSwitch('marketing')} icon={Gift} />
                         <TabButtonUI label="Tracking" isActive={activeTab === 'tracking'} onClick={() => handleTabSwitch('tracking')} icon={Globe} />
                         <TabButtonUI label="External API" isActive={activeTab === 'content'} onClick={() => handleTabSwitch('content')} icon={MessageSquare} />
                     </div>
