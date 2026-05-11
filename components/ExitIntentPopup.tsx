@@ -27,13 +27,15 @@ const ExitIntentPopup: React.FC = () => {
     // Only push state after a short delay to ensure page is fully loaded and user is engaged
     const timer = setTimeout(() => {
       if (!hasShown && isCheckoutPage) {
-        window.history.pushState({ exitIntent: true }, '');
+        // Only push if we haven't already
+        if (window.history.state?.type !== 'exit_intent_trap') {
+          window.history.pushState({ type: 'exit_intent_trap' }, '');
+        }
       }
-    }, 1500);
+    }, 2000);
     
     const handlePopState = (e: PopStateEvent) => {
-      // When user clicks back, we detect if we previously pushed our trap state
-      // If we are at the state before our trap, show the popup
+      // Catch the back button event
       if (!hasShown && isCheckoutPage) {
         setIsVisible(true);
         setHasShown(true);
@@ -81,19 +83,19 @@ const ExitIntentPopup: React.FC = () => {
               <Gift size={24} className="text-white sm:w-8 sm:h-8" />
             </div>
             
-            <h2 className="text-xl sm:text-2xl font-bold mb-1 leading-tight">যাওয়ার আগে একটু দেখুন!</h2>
-            <p className="text-[10px] sm:text-sm opacity-90">এই অফার শুরু এখন পাবেন — পরে আর নাও পেতে পারেন</p>
+            <h2 className="text-xl sm:text-2xl font-bold mb-1 leading-tight">অপেক্ষা করুন! আপনার জন্য একটি বিশেষ উপহার।</h2>
+            <p className="text-[10px] sm:text-sm opacity-90 font-medium">অর্ডারটি সম্পন্ন করতে এই সীমিত সময়ের অফারটি হাতছাড়া করবেন না।</p>
             
             {/* Tag overlapping header and body */}
             <div className="absolute -bottom-5 sm:-bottom-6 left-1/2 -translate-x-1/2 bg-white px-6 sm:px-8 py-2 sm:py-3 rounded-full shadow-lg border-2 border-[#f91d5a] flex items-center gap-2 whitespace-nowrap">
-               <span className="text-[#f91d5a] font-bold text-lg sm:text-xl">৳{settings.exitIntentDiscount} ছাড়</span>
+               <span className="text-[#f91d5a] font-bold text-lg sm:text-xl">৳{settings.exitIntentDiscount} ফ্ল্যাট ছাড়</span>
             </div>
           </div>
 
           <div className="px-5 sm:px-6 pt-8 sm:pt-10 pb-6 sm:pb-8 space-y-4 sm:space-y-5">
              <div className="space-y-2 pt-2">
-                <p className="text-xs sm:text-sm font-medium text-gray-500 flex items-center gap-2">
-                   <Gift size={16} className="text-[#f91d5a]" /> কুপন কোড
+                <p className="text-xs sm:text-sm font-semibold text-gray-600 flex items-center gap-2">
+                   <Gift size={16} className="text-[#f91d5a]" /> এক্সক্লুসিভ কুপন কোড
                 </p>
                 <div className="flex items-center gap-2 p-1 border-2 border-dashed border-orange-200 rounded-xl bg-orange-50/30">
                    <div className="flex-grow px-3 sm:px-4 py-2 sm:py-3 font-mono text-lg sm:text-xl font-bold tracking-widest text-[#f91d5a]">
@@ -101,7 +103,7 @@ const ExitIntentPopup: React.FC = () => {
                    </div>
                    <button 
                     onClick={handleCopy}
-                    className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-[#f91d5a] text-white px-3 sm:px-5 py-2 sm:py-3 rounded-lg text-xs sm:text-sm font-medium hover:opacity-90 active:scale-95 transition-all shadow-md"
+                    className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-[#f91d5a] text-white px-3 sm:px-5 py-2 sm:py-3 rounded-lg text-xs sm:text-sm font-bold hover:opacity-95 active:scale-95 transition-all shadow-md"
                    >
                       {copied ? <Check size={16} /> : <Copy size={16} />}
                       {copied ? 'কপি হয়েছে' : 'কপি করুন'}
@@ -111,8 +113,8 @@ const ExitIntentPopup: React.FC = () => {
 
              <div className="p-3 rounded-xl bg-teal-50 border border-teal-100 flex gap-2 sm:gap-3 items-start">
                 <Info size={16} className="text-teal-600 mt-0.5 shrink-0" />
-                <p className="text-[10px] sm:text-xs text-teal-800 leading-relaxed">
-                   এই কুপন কোডটি বসান — {settings.exitIntentDiscount} টাকা ডিসকাউন্ট পেয়ে যাবেন
+                <p className="text-[10px] sm:text-xs text-teal-800 leading-relaxed font-medium">
+                   কুপন কোডটি পেমেন্ট পেজে ব্যবহার করে সাথে সাথেই {settings.exitIntentDiscount} টাকা ডিসকাউন্ট গ্রহণ করুন।
                 </p>
              </div>
 
