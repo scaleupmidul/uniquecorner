@@ -156,6 +156,7 @@ export interface AppSettings {
   exitIntentPopupEnabled: boolean;
   exitIntentDiscount: number;
   exitIntentCouponCode: string;
+  freeShippingEnabled: boolean;
 }
 
 export interface AdminProductsPagination {
