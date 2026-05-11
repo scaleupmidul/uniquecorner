@@ -31,6 +31,8 @@ const OrderSchema = new mongoose.Schema({
   cartItems: [CartItemSchema],
   total: { type: Number, required: true },
   shippingCharge: { type: Number }, // Explicitly store shipping charge
+  discountAmount: { type: Number, default: 0 },
+  couponCode: { type: String },
   status: {
     type: String,
     enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'],
