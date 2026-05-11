@@ -153,7 +153,7 @@ const CheckoutPage: React.FC = () => {
     city: '', // This acts as the District Selection
     address: '',
     note: '', // Acts as Comment
-    paymentMethod: '',
+    paymentMethod: 'COD',
     shippingOptionId: '',
     paymentNumber: '',
     onlinePaymentMethod: 'Choose',
@@ -293,19 +293,19 @@ const CheckoutPage: React.FC = () => {
   };
 
   const isFormValid = (() => {
+    // Only strictly require shipping info as per user's latest request
     const hasCoreShippingInfo = !!(
-        formData.fullName.trim() && 
-        formData.email.trim() && 
-        formData.phone.trim() && 
+        formData.fullName?.trim() && 
+        formData.phone?.trim() && 
         formData.city && 
-        formData.address.trim()
+        formData.address?.trim()
     );
 
     if (!hasCoreShippingInfo) return false;
 
-    // If online payment is selected and section is visible, require payment details
-    if (formData.paymentMethod === 'Online' && isOnlinePaymentVisible) {
-        if (!formData.paymentNumber.trim() || formData.onlinePaymentMethod === 'Choose') {
+    // If online payment is specifically selected, require payment details
+    if (formData.paymentMethod === 'Online') {
+        if (!formData.paymentNumber?.trim() || formData.onlinePaymentMethod === 'Choose') {
             return false;
         }
     }
