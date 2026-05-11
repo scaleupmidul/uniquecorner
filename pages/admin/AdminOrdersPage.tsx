@@ -41,6 +41,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose, u
     // FIX: Calculate products total by summing items directly to avoid negative values
     // caused by inconsistent total/shipping charge logic in different payment modes.
     const productsTotal = (order.cartItems || []).reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const discount = order.discountAmount || 0;
     const fullName = `${order.firstName} ${order.lastName || ''}`.trim();
 
     return (
@@ -77,6 +78,9 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose, u
                                         ? 'Cash on Delivery' 
                                         : `Online (${order.paymentDetails?.method || 'Advance'})`
                                 }</span></p>
+                                {discount > 0 && (
+                                    <p><span className="font-black text-red-400 uppercase text-[9px] tracking-widest mr-2 font-black">Discount:</span> <span className="font-bold text-red-600">-৳{discount.toLocaleString()}</span></p>
+                                )}
                                 <p><span className="font-black text-stone-400 uppercase text-[9px] tracking-widest mr-2">Logistics:</span> <span className="font-bold text-stone-900">৳{shippingCharge.toLocaleString()}</span></p>
                                 
                                 {order.paymentMethod === 'Online' && order.paymentDetails && (
@@ -125,11 +129,24 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose, u
                         
                         <div className="flex flex-col items-end mt-6 pt-4 border-t-2 border-stone-50">
                             <div className="w-full md:w-64 space-y-1.5 text-right">
-                                <div className="font-extrabold text-2xl text-black">
-                                    <span className="text-sm text-stone-500 font-bold uppercase mr-2">Products Total:</span>
+                                <div className="text-black font-bold text-sm">
+                                    <span className="text-stone-400 uppercase text-[10px] tracking-widest mr-2">Subtotal:</span>
                                     <span>৳{productsTotal.toLocaleString()}</span>
                                 </div>
-                                <p className="text-[10px] text-stone-400 italic">Delivery charge (৳{shippingCharge}) is excluded from this total.</p>
+                                {discount > 0 && (
+                                    <div className="text-red-600 font-bold text-sm">
+                                        <span className="text-stone-400 uppercase text-[10px] tracking-widest mr-2">Discount:</span>
+                                        <span>-৳{discount.toLocaleString()}</span>
+                                    </div>
+                                )}
+                                <div className="text-stone-900 font-bold text-sm">
+                                    <span className="text-stone-400 uppercase text-[10px] tracking-widest mr-2">Shipping:</span>
+                                    <span>৳{shippingCharge.toLocaleString()}</span>
+                                </div>
+                                <div className="font-extrabold text-2xl text-emerald-800 pt-2 border-t border-stone-100">
+                                    <span className="text-[10px] text-stone-500 font-bold uppercase mr-2 tracking-widest">Total Payable:</span>
+                                    <span>৳{order.total.toLocaleString()}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -267,7 +284,7 @@ const AdminOrdersPage: React.FC = () => {
                                         {time && <div className="text-[10px] text-stone-400 mt-0.5">{time}</div>}
                                     </td>
                                     <td className="px-8 py-6">
-                                        <div className="font-black text-stone-900 text-base tracking-tighter font-serif">৳{displayPrice.toLocaleString()}</div>
+                                        <div className="font-black text-stone-900 text-base tracking-tighter font-serif">৳{order.total.toLocaleString()}</div>
                                         <div className="text-[10px] text-emerald-700 font-bold mt-1 uppercase tracking-widest">{order.paymentMethod}</div>
                                     </td>
                                     <td className="px-8 py-6">
