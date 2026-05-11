@@ -296,15 +296,12 @@ const CheckoutPage: React.FC = () => {
     if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.city.trim() || !formData.address.trim()) {
         return false;
     }
-    if (!formData.shippingOptionId && !safeSettings.freeShippingEnabled) {
-        return false;
-    }
     if (formData.paymentMethod === 'Online' && isOnlinePaymentVisible) {
         if (!formData.paymentNumber.trim() || formData.onlinePaymentMethod === 'Choose') {
             return false;
         }
     }
-    if (noPaymentMethodAvailable || (noShippingMethodAvailable && !safeSettings.freeShippingEnabled)) {
+    if (noPaymentMethodAvailable) {
         return false;
     }
     return true;
