@@ -86,7 +86,8 @@ const SettingsSchema = new mongoose.Schema({
   gtmId: { type: String, default: '' },
   exitIntentPopupEnabled: { type: Boolean, default: false },
   exitIntentDiscount: { type: Number, default: 60 },
-  exitIntentCouponCode: { type: String, default: 'SAVE60' }
+  exitIntentCouponCode: { type: String, default: 'SAVE60' },
+  freeShippingEnabled: { type: Boolean, default: false }
 });
 
 const Settings = mongoose.model('Settings', SettingsSchema);
