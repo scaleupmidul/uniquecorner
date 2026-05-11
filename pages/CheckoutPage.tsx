@@ -270,7 +270,7 @@ const CheckoutPage: React.FC = () => {
 
   const shippingCharge = selectedShippingOption?.charge || 0;
   const isOnlinePayment = formData.paymentMethod === 'Online';
-  const effectiveShippingCharge = isOnlinePayment ? 0 : shippingCharge;
+  const effectiveShippingCharge = (isOnlinePayment || safeSettings.freeShippingEnabled) ? 0 : shippingCharge;
   const totalPayable = Math.max(0, (safeCartTotal + effectiveShippingCharge) - discountAmount);
 
   const formattedPaymentInfo = useMemo(() => {
@@ -352,7 +352,7 @@ const CheckoutPage: React.FC = () => {
           cartForOrder,
           totalPayable,
           paymentInfo,
-          shippingCharge,
+          effectiveShippingCharge,
           discountAmount,
           isCouponApplied ? couponCode : undefined
         );
@@ -404,8 +404,8 @@ const CheckoutPage: React.FC = () => {
             )}
 
             <div className="flex justify-between text-stone-600 border-b border-stone-200 pb-4">
-              <span className="font-semibold w-2/3">Shipping ({selectedShippingOption?.label || 'Not selected'})</span>
-              <span>{isOnlinePayment ? '(Advance)' : `৳${shippingCharge.toLocaleString()}`}</span>
+              <span className="font-semibold w-2/3">Shipping ({safeSettings.freeShippingEnabled ? 'Free Delivery' : (selectedShippingOption?.label || 'Not selected')})</span>
+              <span>{safeSettings.freeShippingEnabled ? <span className="text-emerald-700 font-black">FREE</span> : (isOnlinePayment ? '(Advance)' : `৳${shippingCharge.toLocaleString()}`)}</span>
             </div>
 
             {/* Coupon Section */}
@@ -488,19 +488,21 @@ const CheckoutPage: React.FC = () => {
             </div>
           </div>
           
-          <div>
-            <h3 className="text-xl font-bold text-emerald-800 border-b pb-2 mb-4 pt-4">Delivery Charge</h3>
-            <div className="space-y-3">
-              {safeSettings.shippingOptions.map((option) => (
-                <div key={option.id} className={`rounded-lg border transition-all duration-200 overflow-hidden ${formData.shippingOptionId === option.id ? 'bg-emerald-50 border-emerald-800' : 'bg-white border-stone-300'}`} onClick={() => setFormData(prev => ({ ...prev, shippingOptionId: option.id }))}>
-                  <label className="flex items-center w-full p-4 cursor-pointer gap-3">
-                    <input type="radio" name="shippingOptionId" value={option.id} checked={formData.shippingOptionId === option.id} onChange={handleChange} className="form-radio h-5 w-5 text-emerald-800 focus:ring-emerald-800" />
-                    <div className="flex-1 flex justify-between items-center"><span className="font-semibold text-stone-700 text-sm">{option.label}</span><span className="font-bold text-stone-900 text-sm">{option.charge} ৳</span></div>
-                  </label>
-                </div>
-              ))}
+          {!safeSettings.freeShippingEnabled && (
+            <div>
+              <h3 className="text-xl font-bold text-emerald-800 border-b pb-2 mb-4 pt-4">Delivery Charge</h3>
+              <div className="space-y-3">
+                {safeSettings.shippingOptions.map((option) => (
+                  <div key={option.id} className={`rounded-lg border transition-all duration-200 overflow-hidden ${formData.shippingOptionId === option.id ? 'bg-emerald-50 border-emerald-800' : 'bg-white border-stone-300'}`} onClick={() => setFormData(prev => ({ ...prev, shippingOptionId: option.id }))}>
+                    <label className="flex items-center w-full p-4 cursor-pointer gap-3">
+                      <input type="radio" name="shippingOptionId" value={option.id} checked={formData.shippingOptionId === option.id} onChange={handleChange} className="form-radio h-5 w-5 text-emerald-800 focus:ring-emerald-800" />
+                      <div className="flex-1 flex justify-between items-center"><span className="font-semibold text-stone-700 text-sm">{option.label}</span><span className="font-bold text-stone-900 text-sm">{option.charge} ৳</span></div>
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {!noPaymentMethodAvailable && (
               <div>
