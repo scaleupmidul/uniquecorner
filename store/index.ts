@@ -422,7 +422,7 @@ export const useAppStore = create<any>()(
             });
             if (!res.ok) {
                 const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.message || "Failed to place order. Please check your details.");
+                throw new Error(errorData.error || errorData.message || "Failed to place order. Please check your details.");
             }
             const newOrder = await res.json();
             if(get().isAdminAuthenticated) set(state => ({ orders: [newOrder, ...state.orders] }));
