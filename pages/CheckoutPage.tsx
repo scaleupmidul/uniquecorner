@@ -161,7 +161,6 @@ const CheckoutPage: React.FC = () => {
 
   const discountAmount = isCouponApplied ? (storeSettings.exitIntentDiscount || 0) : 0;
   const safeCartTotal = Number.isFinite(cartTotal) ? cartTotal : 0;
-  const discountedSubtotal = Math.max(0, safeCartTotal - discountAmount);
 
   useEffect(() => {
     if (!loading && (!cart || cart.length === 0)) {
@@ -272,7 +271,7 @@ const CheckoutPage: React.FC = () => {
   const shippingCharge = selectedShippingOption?.charge || 0;
   const isOnlinePayment = formData.paymentMethod === 'Online';
   const effectiveShippingCharge = isOnlinePayment ? 0 : shippingCharge;
-  const totalPayable = discountedSubtotal + effectiveShippingCharge;
+  const totalPayable = Math.max(0, (safeCartTotal + effectiveShippingCharge) - discountAmount);
 
   const formattedPaymentInfo = useMemo(() => {
       const info = safeSettings.onlinePaymentInfo || '';
@@ -353,7 +352,9 @@ const CheckoutPage: React.FC = () => {
           cartForOrder,
           totalPayable,
           paymentInfo,
-          shippingCharge
+          shippingCharge,
+          discountAmount,
+          isCouponApplied ? couponCode : undefined
         );
     
         const orderId = newOrder.orderId || newOrder.id;
@@ -392,8 +393,23 @@ const CheckoutPage: React.FC = () => {
           <div className="border-t border-stone-200 pt-4 space-y-3 text-sm">
             <div className="flex justify-between text-stone-600"><span>Subtotal</span><span>৳{safeCartTotal.toLocaleString()}</span></div>
             
+            {isCouponApplied && (
+                 <div className="flex justify-between items-center bg-emerald-50 px-2 py-1.5 rounded-md border border-emerald-100">
+                    <span className="text-[10px] uppercase font-bold text-emerald-700">Coupon Savings</span>
+                    <div className="flex items-center gap-2">
+                       <span className="text-xs font-bold text-emerald-800">-৳{discountAmount.toLocaleString()}</span>
+                       <button onClick={() => { setIsCouponApplied(false); setCouponCode(''); }} className="text-stone-400 hover:text-red-500 p-0.5 transition-colors"><X size={14} /></button>
+                    </div>
+                 </div>
+            )}
+
+            <div className="flex justify-between text-stone-600 border-b border-stone-200 pb-4">
+              <span className="font-semibold w-2/3">Shipping ({selectedShippingOption?.label || 'Not selected'})</span>
+              <span>{isOnlinePayment ? '(Advance)' : `৳${shippingCharge.toLocaleString()}`}</span>
+            </div>
+
             {/* Coupon Section */}
-            <div className="space-y-2 py-2 border-y border-stone-100">
+            <div className="space-y-2 py-3 border-b border-stone-100">
                <div className="flex items-center gap-2">
                   <input 
                     type="text" 
@@ -401,7 +417,7 @@ const CheckoutPage: React.FC = () => {
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                     disabled={isCouponApplied}
-                    className="flex-grow px-3 py-2 text-xs border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-800 outline-none uppercase font-mono"
+                    className="flex-grow px-3 py-2 text-xs border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-800 outline-none uppercase font-mono bg-stone-50"
                   />
                   <button 
                     type="button"
@@ -412,20 +428,6 @@ const CheckoutPage: React.FC = () => {
                     {isCouponApplied ? 'Applied' : 'Apply'}
                   </button>
                </div>
-               {isCouponApplied && (
-                 <div className="flex justify-between items-center bg-emerald-50 px-2 py-1.5 rounded-md">
-                    <span className="text-[10px] uppercase font-bold text-emerald-700">Coupon Discount</span>
-                    <div className="flex items-center gap-2">
-                       <span className="text-xs font-bold text-emerald-800">-৳{discountAmount.toLocaleString()}</span>
-                       <button onClick={() => { setIsCouponApplied(false); setCouponCode(''); }} className="text-stone-400 hover:text-red-500 p-0.5"><X size={14} /></button>
-                    </div>
-                 </div>
-               )}
-            </div>
-
-            <div className="flex justify-between text-stone-600 border-b border-stone-200 pb-4">
-              <span className="font-semibold w-2/3">Shipping ({selectedShippingOption?.label || 'Not selected'})</span>
-              <span>{isOnlinePayment ? '(Advance)' : `৳${shippingCharge.toLocaleString()}`}</span>
             </div>
           </div>
           <div className="mt-4 p-3 bg-stone-50 rounded-lg border border-stone-200 flex justify-between items-center shadow-sm">
