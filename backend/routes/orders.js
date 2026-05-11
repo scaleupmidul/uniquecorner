@@ -30,7 +30,7 @@ const sendOrderEmailToAdmin = async (order) => {
       <td style="padding: 12px; border-bottom: 1px solid #eee;"><img src="${item.image}" width="50" style="border-radius: 4px;" /></td>
       <td style="padding: 12px; border-bottom: 1px solid #eee;">
         <div style="font-weight: bold; font-size: 14px;">${item.name}</div>
-        <div style="font-size: 12px; color: #666;">Size: ${item.size} | Qty: ${item.quantity}</div>
+        <div style="font-size: 12px; color: #666;">${item.size ? `Size: ${item.size} | ` : ''}Qty: ${item.quantity}</div>
       </td>
       <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right; font-weight: bold;">৳${(item.price * item.quantity).toLocaleString()}</td>
     </tr>`).join('');
@@ -168,19 +168,19 @@ router.post('/', async (req, res) => {
     }
     const order = new Order({
         orderId: uniqueId,
-        firstName: customerDetails?.firstName,
-        lastName: customerDetails?.lastName,
-        email: customerDetails?.email,
-        phone: customerDetails?.phone,
-        address: customerDetails?.address,
+        firstName: customerDetails?.firstName || 'Customer',
+        lastName: customerDetails?.lastName || '',
+        email: customerDetails?.email || 'no-email@provided.com',
+        phone: customerDetails?.phone || '',
+        address: customerDetails?.address || '',
         city: customerDetails?.city || '',
         note: customerDetails?.note || '',
         cartItems,
         total,
-        shippingCharge,
+        shippingCharge: shippingCharge || 0,
         discountAmount: discountAmount || 0,
-        couponCode,
-        paymentMethod: paymentInfo?.paymentMethod,
+        couponCode: couponCode || '',
+        paymentMethod: (paymentInfo?.paymentMethod === 'Online' || paymentInfo?.paymentMethod === 'COD') ? paymentInfo.paymentMethod : 'COD',
         paymentDetails: paymentInfo?.paymentDetails,
         date: new Date().toISOString().split('T')[0],
         status: 'Pending',
