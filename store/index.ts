@@ -390,7 +390,7 @@ export const useAppStore = create<any>()(
             set({ newOrdersCount: 0 });
         },
 
-        addOrder: async (customerDetails, cartItems, total, paymentInfo, shippingCharge) => {
+        addOrder: async (customerDetails, cartItems, total, paymentInfo, shippingCharge, discountAmount, couponCode) => {
             // Helper to get Google Analytics Client ID from cookies
             const getGaClientId = () => {
                 try {
@@ -414,6 +414,8 @@ export const useAppStore = create<any>()(
                     total, 
                     paymentInfo, 
                     shippingCharge,
+                    discountAmount,
+                    couponCode,
                     gaClientId // Sending to backend for server-side tracking
                 }) 
             });
