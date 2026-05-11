@@ -123,7 +123,8 @@ const ThankYouPage: React.FC<ThankYouPageProps> = ({ orderId }) => {
     }
 
     const subtotal = (order.cartItems || []).reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shipping = order.total - subtotal;
+    const discount = order.discountAmount || 0;
+    const shipping = order.shippingCharge !== undefined ? order.shippingCharge : (order.total + discount - subtotal);
     const displayOrderId = order.orderId || order.id;
     const isOnlinePayment = order.paymentMethod === 'Online';
 
@@ -205,6 +206,12 @@ const ThankYouPage: React.FC<ThankYouPageProps> = ({ orderId }) => {
                                 <span>Subtotal</span>
                                 <span className="font-medium text-stone-900">৳{subtotal.toLocaleString('en-IN')}</span>
                             </div>
+                            {discount > 0 && (
+                                <div className="flex justify-between text-emerald-700 font-medium bg-emerald-50 px-2 py-1 rounded">
+                                    <span>Coupon Discount</span>
+                                    <span>-৳{discount.toLocaleString('en-IN')}</span>
+                                </div>
+                            )}
                             <div className="flex justify-between text-stone-600">
                                 <span>Shipping</span>
                                 <span className="font-medium text-stone-900">{isOnlinePayment ? '(Advance)' : `৳${shipping.toLocaleString('en-IN')}`}</span>
