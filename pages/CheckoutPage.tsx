@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useAppStore } from '../store';
-import { LoaderCircle, ChevronDown } from 'lucide-react';
+import { LoaderCircle, ChevronDown, X } from 'lucide-react';
 import { trackServerEvent } from '../services/trackingService';
 
 // Bangladesh 64 Districts List
@@ -127,6 +127,24 @@ const CheckoutPage: React.FC = () => {
       };
   }, [storeSettings]);
 
+  const [couponCode, setCouponCode] = useState('');
+  const [isCouponApplied, setIsCouponApplied] = useState(false);
+  const [couponError, setCouponError] = useState('');
+
+  const handleApplyCoupon = () => {
+    if (!couponCode.trim()) return;
+    
+    if (couponCode.toUpperCase() === storeSettings.exitIntentCouponCode?.toUpperCase()) {
+      setIsCouponApplied(true);
+      setCouponError('');
+      notify('Coupon applied successfully!', 'success');
+    } else {
+      setIsCouponApplied(false);
+      setCouponError('Invalid coupon code');
+      notify('Invalid coupon code', 'error');
+    }
+  };
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -141,7 +159,9 @@ const CheckoutPage: React.FC = () => {
     transactionId: '',
   });
 
+  const discountAmount = isCouponApplied ? (storeSettings.exitIntentDiscount || 0) : 0;
   const safeCartTotal = Number.isFinite(cartTotal) ? cartTotal : 0;
+  const discountedSubtotal = Math.max(0, safeCartTotal - discountAmount);
 
   useEffect(() => {
     if (!loading && (!cart || cart.length === 0)) {
@@ -252,7 +272,7 @@ const CheckoutPage: React.FC = () => {
   const shippingCharge = selectedShippingOption?.charge || 0;
   const isOnlinePayment = formData.paymentMethod === 'Online';
   const effectiveShippingCharge = isOnlinePayment ? 0 : shippingCharge;
-  const totalPayable = safeCartTotal + effectiveShippingCharge;
+  const totalPayable = discountedSubtotal + effectiveShippingCharge;
 
   const formattedPaymentInfo = useMemo(() => {
       const info = safeSettings.onlinePaymentInfo || '';
@@ -371,6 +391,38 @@ const CheckoutPage: React.FC = () => {
           </div>
           <div className="border-t border-stone-200 pt-4 space-y-3 text-sm">
             <div className="flex justify-between text-stone-600"><span>Subtotal</span><span>৳{safeCartTotal.toLocaleString()}</span></div>
+            
+            {/* Coupon Section */}
+            <div className="space-y-2 py-2 border-y border-stone-100">
+               <div className="flex items-center gap-2">
+                  <input 
+                    type="text" 
+                    placeholder="Coupon code" 
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    disabled={isCouponApplied}
+                    className="flex-grow px-3 py-2 text-xs border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-800 outline-none uppercase font-mono"
+                  />
+                  <button 
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={isCouponApplied || !couponCode}
+                    className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${isCouponApplied ? 'bg-emerald-100 text-emerald-800' : 'bg-emerald-800 text-white hover:bg-emerald-900 disabled:bg-stone-200 disabled:text-stone-400'}`}
+                  >
+                    {isCouponApplied ? 'Applied' : 'Apply'}
+                  </button>
+               </div>
+               {isCouponApplied && (
+                 <div className="flex justify-between items-center bg-emerald-50 px-2 py-1.5 rounded-md">
+                    <span className="text-[10px] uppercase font-bold text-emerald-700">Coupon Discount</span>
+                    <div className="flex items-center gap-2">
+                       <span className="text-xs font-bold text-emerald-800">-৳{discountAmount.toLocaleString()}</span>
+                       <button onClick={() => { setIsCouponApplied(false); setCouponCode(''); }} className="text-stone-400 hover:text-red-500 p-0.5"><X size={14} /></button>
+                    </div>
+                 </div>
+               )}
+            </div>
+
             <div className="flex justify-between text-stone-600 border-b border-stone-200 pb-4">
               <span className="font-semibold w-2/3">Shipping ({selectedShippingOption?.label || 'Not selected'})</span>
               <span>{isOnlinePayment ? '(Advance)' : `৳${shippingCharge.toLocaleString()}`}</span>
