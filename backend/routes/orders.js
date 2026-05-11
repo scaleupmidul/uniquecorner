@@ -1,7 +1,7 @@
 
 import express from 'express';
 import nodemailer from 'nodemailer';
-import Order from '../models/Order.js';
+import OrderModel from '../models/Order.js';
 import Product from '../models/Product.js';
 import Settings from '../models/Settings.js';
 import { protect } from '../middleware/authMiddleware.js';
@@ -83,17 +83,17 @@ const sendOrderEmailToAdmin = async (order) => {
 // @desc    Get dashboard stats (Now with Real Unique Customer Count)
 router.get('/stats', protect, async (req, res) => {
     try {
-        const totalOrders = await Order.countDocuments();
-        const onlineTransactions = await Order.countDocuments({ paymentMethod: 'Online' });
+        const totalOrders = await OrderModel.countDocuments();
+        const onlineTransactions = await OrderModel.countDocuments({ paymentMethod: 'Online' });
         const totalProducts = await Product.countDocuments();
         const outOfStockCount = await Product.countDocuments({ isOutOfStock: true });
 
         // Functional: Unique Customer Count based on Phone numbers
-        const uniqueCustomers = await Order.distinct('phone');
+        const uniqueCustomers = await OrderModel.distinct('phone');
         const customerCount = uniqueCustomers.length;
 
         // Aggregate for Category-wise Revenue
-        const categoryResult = await Order.aggregate([
+        const categoryResult = await OrderModel.aggregate([
             { $match: { status: { $ne: 'Cancelled' } } },
             { $unwind: '$cartItems' },
             { $lookup: {
@@ -116,7 +116,7 @@ router.get('/stats', protect, async (req, res) => {
             }}
         ]);
 
-        const cosmeticsOrders = await Order.countDocuments({ 'cartItems.name': { $regex: /cosmetic|beauty|serum|lip/i } });
+        const cosmeticsOrders = await OrderModel.countDocuments({ 'cartItems.name': { $regex: /cosmetic|beauty|serum|lip/i } });
         
         const stats = categoryResult[0] || { totalRevenue: 0, cosmeticsRevenue: 0, fashionRevenue: 0 };
 
@@ -140,7 +140,7 @@ router.get('/stats', protect, async (req, res) => {
 
 router.get('/', protect, async (req, res) => {
   try {
-    const orders = await Order.find({}).sort({ createdAt: -1 });
+    const orders = await OrderModel.find({}).sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) { res.status(500).json({ message: 'Server Error' }); }
 });
@@ -148,8 +148,8 @@ router.get('/', protect, async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     let order;
-    if (/^\d{5,7}$/.test(req.params.id)) { order = await Order.findOne({ orderId: req.params.id }); }
-    else { order = await Order.findById(req.params.id); }
+    if (/^\d{5,7}$/.test(req.params.id)) { order = await OrderModel.findOne({ orderId: req.params.id }); }
+    else { order = await OrderModel.findById(req.params.id); }
     if (order) res.json(order);
     else res.status(404).json({ message: 'Order not found' });
   } catch (error) { res.status(404).json({ message: 'Order not found' }); }
@@ -163,10 +163,10 @@ router.post('/', async (req, res) => {
     let isUnique = false;
     while (!isUnique) {
         uniqueId = Math.floor(10000 + Math.random() * 9989999).toString();
-        const existing = await Order.findOne({ orderId: uniqueId });
+        const existing = await OrderModel.findOne({ orderId: uniqueId });
         if (!existing) isUnique = true;
     }
-    const order = new Order({
+    const order = new OrderModel({
         orderId: uniqueId,
         firstName: customerDetails?.firstName || 'Customer',
         lastName: customerDetails?.lastName || '',
@@ -218,7 +218,7 @@ router.post('/', async (req, res) => {
         const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
         // Split name for Meta
-        const nameParts = (customerDetails.firstName || '').split(' ');
+        const nameParts = (customerDetails?.firstName || '').split(' ');
         const firstName = nameParts[0] || '';
         const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
 
@@ -258,7 +258,7 @@ router.post('/', async (req, res) => {
 
 router.put('/:id/status', protect, async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const order = await OrderModel.findById(req.params.id);
     if (order) {
       order.status = req.body.status;
       const updatedOrder = await order.save();
@@ -269,7 +269,7 @@ router.put('/:id/status', protect, async (req, res) => {
 
 router.delete('/:id', protect, async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const order = await OrderModel.findById(req.params.id);
     if (order) { await order.deleteOne(); res.json({ message: 'Order removed' }); }
     else { res.status(404).json({ message: 'Order not found' }); }
   } catch (error) { res.status(500).json({ message: 'Server Error' }); }
