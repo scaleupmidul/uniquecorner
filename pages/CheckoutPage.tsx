@@ -296,7 +296,7 @@ const CheckoutPage: React.FC = () => {
     if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.city.trim() || !formData.address.trim()) {
         return false;
     }
-    if (!formData.shippingOptionId) {
+    if (!safeSettings.freeShippingEnabled && !formData.shippingOptionId) {
         return false;
     }
     if (formData.paymentMethod === 'Online' && isOnlinePaymentVisible) {
@@ -437,11 +437,16 @@ const CheckoutPage: React.FC = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="lg:col-span-3 space-y-6 bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-stone-200 order-2 lg:order-1">
-          <div>
-            <h3 className="text-xl font-bold text-emerald-800 border-b pb-2 mb-6">Shipping Information</h3>
-            <div className="space-y-5">
-              <InputField label="Full Name ( সম্পূন্ন নাম )" name="fullName" value={formData.fullName} onChange={handleChange} required error={isAttempted && !formData.fullName.trim()} />
+        <form onSubmit={handleSubmit} className="lg:col-span-3 space-y-8 bg-white p-4 sm:p-7 rounded-2xl shadow-xl border border-stone-200 order-2 lg:order-1">
+          <section>
+            <h3 className="text-xl font-bold text-emerald-800 border-b-2 border-emerald-50 pb-3 mb-6 flex items-center gap-2">
+               <span className="w-1.5 h-6 bg-emerald-800 rounded-full"></span>
+               Shipping Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="md:col-span-2">
+                <InputField label="Full Name ( সম্পূন্ন নাম )" name="fullName" value={formData.fullName} onChange={handleChange} required error={isAttempted && !formData.fullName.trim()} />
+              </div>
               <InputField label="EMAIL ADDRESS ( ইমেল এড্রেস )" name="email" type="email" value={formData.email} onChange={handleChange} required error={isAttempted && !formData.email.trim()} />
               <InputField label="MOBILE NUMBER (মোবাইল নম্বর)" name="phone" type="tel" value={formData.phone} onChange={handleChange} required error={isAttempted && !formData.phone.trim()} />
               
@@ -469,7 +474,7 @@ const CheckoutPage: React.FC = () => {
                   </div>
               </div>
 
-              <div className="space-y-1.5">
+              <div className="md:col-span-2 space-y-1.5">
                 <label htmlFor="address" className="text-xs font-bold text-stone-600 uppercase tracking-wider ml-1">
                     Delivery Address (ডেলিভারি ঠিকানা) <span className="text-red-500">*</span>
                 </label>
@@ -480,18 +485,21 @@ const CheckoutPage: React.FC = () => {
                   [&:-webkit-autofill]:shadow-[0_0_0_1000px_white_inset]`} />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="md:col-span-2 space-y-1.5">
                 <label htmlFor="note" className="text-xs font-bold text-stone-600 uppercase tracking-wider ml-1">
                     COMMENT (মন্তব্য - OPTIONAL)
                 </label>
                 <textarea id="note" name="note" value={formData.note} onChange={handleChange} rows={3} className={`w-full px-4 py-3 border border-stone-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-800 transition-all duration-300 ease-out bg-white text-stone-800 text-sm shadow-sm hover:border-stone-300 resize-none`} />
               </div>
             </div>
-          </div>
+          </section>
           
           {!safeSettings.freeShippingEnabled && (
-            <div>
-              <h3 className="text-xl font-bold text-emerald-800 border-b pb-2 mb-4 pt-4">Delivery Charge</h3>
+            <section>
+              <h3 className="text-xl font-bold text-emerald-800 border-b-2 border-emerald-50 pb-3 mb-6 flex items-center gap-2">
+                 <span className="w-1.5 h-6 bg-emerald-800 rounded-full"></span>
+                 Delivery Charge
+              </h3>
               <div className="space-y-3">
                 {safeSettings.shippingOptions.map((option) => (
                   <div key={option.id} className={`rounded-lg border transition-all duration-200 overflow-hidden ${formData.shippingOptionId === option.id ? 'bg-emerald-50 border-emerald-800' : 'bg-white border-stone-300'}`} onClick={() => setFormData(prev => ({ ...prev, shippingOptionId: option.id }))}>
@@ -502,12 +510,15 @@ const CheckoutPage: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
           )}
 
           {!noPaymentMethodAvailable && (
-              <div>
-                <h3 className="text-xl font-bold text-emerald-800 border-b pb-2 mb-4 pt-4">Payment Method</h3>
+              <section>
+                <h3 className="text-xl font-bold text-emerald-800 border-b-2 border-emerald-50 pb-3 mb-6 flex items-center gap-2">
+                   <span className="w-1.5 h-6 bg-emerald-800 rounded-full"></span>
+                   Payment Method
+                </h3>
                 <div className="space-y-3">
                    {safeSettings.codEnabled && (
                       <div className="rounded-lg border border-stone-300 bg-white" onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'COD' }))}>
@@ -548,7 +559,7 @@ const CheckoutPage: React.FC = () => {
                       </div>
                     )}
                 </div>
-              </div>
+              </section>
           )}
           
           <div className="pt-4 pb-6">
