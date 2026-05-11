@@ -48,6 +48,8 @@ export interface Order {
   cartItems: CartItem[];
   total: number;
   shippingCharge?: number;
+  discountAmount?: number;
+  couponCode?: string;
   status: OrderStatus;
   date: string;
   createdAt?: string;
@@ -220,7 +222,7 @@ export interface AppState {
   updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
   refreshOrders: () => Promise<void>;
   markOrdersAsSeen: () => void;
-  addOrder: (customerDetails: any, cartItems: any[], total: number, paymentInfo: any, shippingCharge: number) => Promise<Order>;
+  addOrder: (customerDetails: any, cartItems: any[], total: number, paymentInfo: any, shippingCharge: number, discountAmount?: number, couponCode?: string) => Promise<Order>;
   deleteOrder: (orderId: string) => Promise<void>;
   addContactMessage: (messageData: any) => Promise<void>;
   markMessageAsRead: (messageId: string, isRead: boolean) => Promise<void>;
