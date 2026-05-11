@@ -293,17 +293,23 @@ const CheckoutPage: React.FC = () => {
   };
 
   const isFormValid = (() => {
-    if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.city.trim() || !formData.address.trim()) {
-        return false;
-    }
+    const hasCoreShippingInfo = !!(
+        formData.fullName.trim() && 
+        formData.email.trim() && 
+        formData.phone.trim() && 
+        formData.city && 
+        formData.address.trim()
+    );
+
+    if (!hasCoreShippingInfo) return false;
+
+    // If online payment is selected and section is visible, require payment details
     if (formData.paymentMethod === 'Online' && isOnlinePaymentVisible) {
         if (!formData.paymentNumber.trim() || formData.onlinePaymentMethod === 'Choose') {
             return false;
         }
     }
-    if (noPaymentMethodAvailable) {
-        return false;
-    }
+
     return true;
   })();
 
