@@ -44,7 +44,8 @@ const DEFAULT_SETTINGS: AppSettings = {
     signatureCosmeticsMobileImage: '',
     exitIntentPopupEnabled: true,
     exitIntentDiscount: 60,
-    exitIntentCouponCode: 'SAVE60'
+    exitIntentCouponCode: 'SAVE60',
+    freeShippingEnabled: false
 };
 
 const MOCK_PRODUCTS_DATA: Product[] = [];
