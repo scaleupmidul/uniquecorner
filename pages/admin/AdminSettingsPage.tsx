@@ -5,7 +5,7 @@ import {
     Save, LoaderCircle, Plus, Trash2, CheckCircle, Monitor, 
     Smartphone, Tag, CreditCard, Layout, Image as ImageIcon, 
     MessageSquare, Shield, X, Share2, Facebook, Instagram, 
-    Twitter, Youtube, ExternalLink, Settings as SettingsIcon, Gift,
+    Twitter, Youtube, ExternalLink, Settings as SettingsIcon, Gift, Truck,
     Type, Percent, Palette, Move, AlertTriangle, HelpCircle,
     ShoppingBag, Info, Sparkles, Layers, Eye, EyeOff, SmartphoneNfc,
     Globe, PhoneCall, MapPin, MousePointer2, AlignLeft,
@@ -254,6 +254,7 @@ const AdminSettingsPage: React.FC = () => {
     const [exitIntentPopupEnabled, setExitIntentPopupEnabled] = useState(false);
     const [exitIntentDiscount, setExitIntentDiscount] = useState(60);
     const [exitIntentCouponCode, setExitIntentCouponCode] = useState('SAVE60');
+    const [freeShippingEnabled, setFreeShippingEnabled] = useState(false);
 
     // Initialize state from store
     useEffect(() => {
@@ -313,6 +314,7 @@ const AdminSettingsPage: React.FC = () => {
             setExitIntentPopupEnabled(settings.exitIntentPopupEnabled ?? false);
             setExitIntentDiscount(settings.exitIntentDiscount || 60);
             setExitIntentCouponCode(settings.exitIntentCouponCode || 'SAVE60');
+            setFreeShippingEnabled(settings.freeShippingEnabled ?? false);
         }
     }, [settings]);
 
@@ -398,7 +400,8 @@ const AdminSettingsPage: React.FC = () => {
                 gtmId,
                 exitIntentPopupEnabled,
                 exitIntentDiscount,
-                exitIntentCouponCode
+                exitIntentCouponCode,
+                freeShippingEnabled
             });
             setIsSaved(true);
             setConfirmSyncText('');
@@ -585,7 +588,20 @@ const AdminSettingsPage: React.FC = () => {
                         )}
                     </div>
                     <div className={cardClass}>
-                        <div className="flex justify-between items-center mb-2">
+                        <div className="space-y-4 mb-6">
+                            <label className={`flex items-center gap-4 p-5 border-2 rounded-2xl cursor-pointer transition-all ${freeShippingEnabled ? 'border-emerald-800 bg-emerald-50/50 shadow-md' : 'border-stone-100 bg-stone-50'}`}>
+                                <div className={`p-2 rounded-lg ${freeShippingEnabled ? 'bg-emerald-800 text-white' : 'bg-stone-200 text-stone-400'}`}>
+                                    <Truck className="w-5 h-5" />
+                                </div>
+                                <div className="flex-grow">
+                                    <span className="block text-sm font-black uppercase tracking-tight text-stone-800">Charge Free (Free Delivery)</span>
+                                    <span className="text-[10px] text-stone-400 uppercase font-bold">Disable delivery charge selection and set to 0৳ for all orders</span>
+                                </div>
+                                <input type="checkbox" checked={freeShippingEnabled} onChange={e => setFreeShippingEnabled(e.target.checked)} className="w-6 h-6 text-emerald-800 rounded-lg" />
+                            </label>
+                        </div>
+
+                        <div className="flex justify-between items-center mb-2 pt-4 border-t border-stone-100">
                             <CompactSectionHeader icon={Move} title="Logistics Engine" sub="Delivery Charge Matrix" />
                             <button onClick={handleAddShipping} className="text-emerald-800 font-bold text-[10px] uppercase flex items-center gap-1 border border-emerald-100 px-3 py-1 rounded-lg hover:bg-emerald-50">+ Add Zone</button>
                         </div>
