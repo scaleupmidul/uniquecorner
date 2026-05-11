@@ -124,6 +124,7 @@ const CheckoutPage: React.FC = () => {
         onlinePaymentMethods: Array.isArray(storeSettings.onlinePaymentMethods) ? storeSettings.onlinePaymentMethods : [],
         onlinePaymentInfo: typeof storeSettings.onlinePaymentInfo === 'string' ? storeSettings.onlinePaymentInfo : '',
         onlinePaymentInfoStyles: storeSettings.onlinePaymentInfoStyles || { fontSize: '0.875rem' },
+        freeShippingEnabled: storeSettings.freeShippingEnabled ?? false,
       };
   }, [storeSettings]);
 
