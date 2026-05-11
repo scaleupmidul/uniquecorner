@@ -22,6 +22,7 @@ const sendOrderEmailToAdmin = async (order) => {
 
   const productsSubtotal = (order.cartItems || []).reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shippingCharge = order.shippingCharge || 0;
+  const discountAmount = order.discountAmount || 0;
   const grandTotal = order.total;
 
   const itemsHtml = order.cartItems.map(item => `
@@ -62,6 +63,7 @@ const sendOrderEmailToAdmin = async (order) => {
           <div style="margin-bottom: 5px; color: #666; font-size: 14px;">
             Subtotal: ৳${productsSubtotal.toLocaleString()}
           </div>
+          ${discountAmount > 0 ? `<div style="margin-bottom: 5px; color: #dc2626; font-size: 14px;">Coupon Discount: -৳${discountAmount.toLocaleString()}</div>` : ''}
           <div style="margin-bottom: 10px; color: #666; font-size: 14px;">
             Delivery Charge: ৳${shippingCharge.toLocaleString()}
           </div>
@@ -155,7 +157,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { customerDetails, cartItems, total, paymentInfo, shippingCharge } = req.body;
+    const { customerDetails, cartItems, total, paymentInfo, shippingCharge, discountAmount, couponCode } = req.body;
     if (!cartItems || cartItems.length === 0) return res.status(400).json({ message: 'Cart is empty' });
     let uniqueId;
     let isUnique = false;
@@ -176,6 +178,8 @@ router.post('/', async (req, res) => {
         cartItems,
         total,
         shippingCharge,
+        discountAmount: discountAmount || 0,
+        couponCode,
         paymentMethod: paymentInfo?.paymentMethod,
         paymentDetails: paymentInfo?.paymentDetails,
         date: new Date().toISOString().split('T')[0],
